@@ -1,1 +1,3 @@
-__author__ = 'tonnie.lwt@gmail.coms'
+from flask import Blueprint
+
+users = Blueprint('users', __name__, url_prefix='users')

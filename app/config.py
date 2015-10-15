@@ -1,6 +1,6 @@
 import os
 
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 class BaseConfig:
     SECRET_KEY = '693bda65112eb4b1eab2bfe3fa8e672ad220fa7c'
@@ -14,6 +14,13 @@ class BaseConfig:
 class DevConfig(BaseConfig):
     MONGO_HOST = '127.0.0.1'
     MONGO_PORT = 27017
+    MONGO_DBNAME = 'pkyx'
+
+    @staticmethod
+    def init_app(app):
+        from flask.ext.pymongo import PyMongo
+        app = PyMongo(app)
+        return app
 
 config = {
     'dev': DevConfig,
