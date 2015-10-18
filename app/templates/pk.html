@@ -5,6 +5,9 @@
     <title>PK</title>
 </head>
 <body>
+    {% for message in get_flashed_messages() %}
+        {{ message }}
+    {% endfor %}
     <h1>{{pk1}}</h1> PK <h1>{{pk2}}</h1>
 </body>
 </html>
