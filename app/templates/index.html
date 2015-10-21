@@ -6,7 +6,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    欢迎,{{ username }}
+    {% for message in get_flashed_messages(category_filter=['WARNING']) %}
+        {{ message }}
+    {% endfor %}
     <form action="{{ url_for('.pk') }}" method="post">
         {{ form.csrf_token }}
         {{ form.pk1() }}
