@@ -1,7 +1,7 @@
 __author__ = 'tonnie.lwt@gmail.com'
 
 from flask import Flask
-from config import config
+from app.config import config
 from flask.ext.pymongo import PyMongo
 
 mongo = PyMongo()
@@ -14,10 +14,10 @@ def create_app(config_name='dev'):
     # 初始化MongoDB
     mongo.init_app(app)
 
-    from main import main as main_blueprint
+    from app.main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
-    from api import api as api_blueprint
+    from app.api import api as api_blueprint
     app.register_blueprint(api_blueprint)
 
     return app
