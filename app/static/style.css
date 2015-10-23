@@ -1,0 +1,11 @@
+.WARNING {
+    color: rgb(236, 204, 56);
+}
+
+.ERROR {
+    color: #ff615f;
+}
+
+.SUCCESS {
+    color: #578037;
+}

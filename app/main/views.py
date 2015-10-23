@@ -19,7 +19,7 @@ def pk():
         pk1_data = mongo.db.items.find({'title': pk1_name})
         pk2_data = mongo.db.items.find({'title':pk2_name})
         print(url_for('api.item_api'))
-        flash('查询成功', 'INFO')
+        flash('查询成功', 'SUCCESS')
         return render_template('pk.html',pk1=pk1_name, pk2=pk2_name)
     flash('非法请求', 'WARNING')
     return render_template('pk.html')

@@ -1,9 +1,22 @@
-from flask.ext.wtf import Form
-from wtforms import StringField, SubmitField
+from flask.ext.wtf import Form, RecaptchaField
+from flask.ext.wtf.html5 import EmailField
+from wtforms import StringField, SubmitField, PasswordField
 from wtforms.validators import DataRequired
 
 class PkForm(Form):
     pk1 = StringField(validators=[DataRequired()])
     pk2 = StringField(validators=[DataRequired()])
-    submit = SubmitField(label='pk一下')
+    submit = SubmitField('pk一下')
 
+class LoginForm(Form):
+    email = EmailField('邮箱', validators=[DataRequired()])
+    password = PasswordField('密码', validators=[DataRequired()])
+    # recaptcha = RecaptchaField('验证码', validators=[DataRequired()])
+    submit = SubmitField('登录')
+
+class RegisterForm(Form):
+    email = EmailField('邮箱', validators=[DataRequired()])
+    username = StringField('用户名', validators=[DataRequired()])
+    password = PasswordField('密码', validators=[DataRequired()])
+    repeat = PasswordField('重复密码', validators=[DataRequired()])
+    submit = SubmitField('注册')
