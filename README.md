@@ -14,6 +14,8 @@ pkyx是基于Flask开发的一个比较网站，灵感来自于[VSChart](http://
 
 [Day 5：编写用户和认证模块](http://livevilwt.me/blog/article/61/)
 
+[Day 6：用模版继承组件化应用](http://livevilwt.me/blog/article/62/)
+
 
 ## 安装依赖
 ---

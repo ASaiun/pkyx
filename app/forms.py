@@ -12,7 +12,6 @@ class LoginForm(Form):
     email = EmailField('邮箱', validators=[DataRequired()])
     password = PasswordField('密码', validators=[DataRequired()])
     # recaptcha = RecaptchaField('验证码', validators=[DataRequired()])
-    submit = SubmitField('登录')
 
 class RegisterForm(Form):
     email = EmailField('邮箱', validators=[DataRequired()])

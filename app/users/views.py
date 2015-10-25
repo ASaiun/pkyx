@@ -1,8 +1,8 @@
 from app import mongo
 from app.forms import LoginForm, RegisterForm
 from app.models import User
-from flask import render_template, redirect, url_for, request, flash
-from flask.ext.login import login_required, login_user, logout_user, current_user
+from flask import render_template, redirect, url_for, request, flash, jsonify
+from flask.ext.login import login_required, login_user, logout_user
 
 from . import users
 
@@ -21,26 +21,26 @@ def register():
         else:
             mongo.db.users.insert({'email':email, 'username':uname, 'password': User.gen_passwd_hash(passwd)})
             flash('注册成功', 'SUCCESS')
-            return redirect(url_for('.login'))
+            return redirect(url_for('main.index'))
     return render_template('register.html', form=form)
 
-@users.route('/login', methods=['GET', 'POST'])
+@users.route('/login', methods=['POST'])
 def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        db_user = mongo.db.users.find_one({'email': form.email.data})
-        if db_user is not None:
-            db_passwd = db_user.get('password', None)
-            if User.verify_passwd(db_passwd, form.password.data):
-                user = User(db_user['_id'])
-                login_user(user)
-                flash('登录成功', 'SUCCESS')
-                return redirect(request.args.get('next') or url_for('main.index'))
+    if request.method == 'POST':
+        form = LoginForm()
+        if form.validate_on_submit():
+            db_user = mongo.db.users.find_one({'email': form.email.data})
+            if db_user is not None:
+                db_passwd = db_user.get('password', None)
+                if User.verify_passwd(db_passwd, form.password.data):
+                    user = User(db_user['_id'])
+                    login_user(user)
+                    return jsonify(status=True, reason="登录成功", redirect_url=url_for('main.index'))
+                else:
+                    return jsonify(status=False, reason="邮箱或密码错误")
             else:
-                flash('邮箱或密码错误', 'WARNING')
-        else:
-            flash('不存在该用户', 'WARNING')
-    return render_template('login.html', form=form)
+                return jsonify(status=False, reason="不存在该用户")
+        return jsonify(status=False, reason="登录失败")
 
 @users.route('/profile')
 @login_required

@@ -9,3 +9,9 @@
 .SUCCESS {
     color: #578037;
 }
+
+div {display:block;}
+
+#container {
+    margin-top: 100px;
+}

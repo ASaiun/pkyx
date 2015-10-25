@@ -6,28 +6,23 @@
 
 {% block content %}
 {% include 'comp/header.html' %}
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-            <li class="{{ category }}">{{ message }}</li>
-        {% endfor %}
-    {% endif %}
-{% endwith %}
-
-{% if current_user.is_authenticated %}
-    <a href="{{ url_for('users.profile', name=current_user.username) }}">{{ current_user.username }}</a>
-    <a href="{{ url_for('users.logout') }}">登出</a>
-{% else %}
-    <a href="{{ url_for('users.login') }}">登录</a>
-{% endif %}
-
-    <form action="{{ url_for('.pk') }}" method="post">
-        {{ form.csrf_token }}
-        {{ form.pk1() }}
-        {{ form.pk2() }}
-        {{ form.submit() }}
+{% include 'comp/login.html' %}
+<div class="ui container" id="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <form action="{{ url_for('.pk') }}" method="post" id="pk_form">
+        {{ pk_form.csrf_token }}
+        {{ pk_form.pk1() }}
+        {{ pk_form.pk2() }}
+        {{ pk_form.submit() }}
     </form>
+</div>
 {% endblock %}
 {% block js %}
-
+<script src="{{ url_for('static', filename='js/login.js') }}"></script>
 {% endblock %}

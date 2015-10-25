@@ -1,10 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+<title>{{pk1}} PK {{pk2}}</title>
+{% endblock %}
+{% block content %}
+{% include "comp/header.html" %}
+<div class="ui container" id="container">
     用户
-</body>
-</html>
+</div>
+{% endblock %}
+{% block js %}
+
+{% endblock %}

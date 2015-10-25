@@ -1,15 +1,15 @@
-from flask import render_template, request, flash, url_for, Response
+from flask import render_template, request, flash, url_for, current_app
 from app import mongo
-from app.forms import PkForm
+from app.forms import PkForm, LoginForm
 
 from . import main
 
 
 @main.route('/')
 def index():
-    # mongo.db.items.insert({'title':'iPhone 6S', 'attributes':[{'price':'799$'}]})
     pk_form = PkForm()
-    return render_template('index.html', form=pk_form)
+    lg_form = LoginForm()
+    return render_template('index.html', pk_form=pk_form, lg_form=lg_form)
 
 
 @main.route('/pk', methods=['GET', 'POST'])
@@ -29,4 +29,9 @@ def pk():
 
 @main.route('/create_entry', methods=['GET', 'POST'])
 def create_entry():
-    return render_template('create.html')
+    if request.method == 'POST':
+        title = request.form.pop('title')
+        type = request.form.pop('type')
+        # mongo.db.items.insert({'title':XXX, 'attributes':[{'XX':'XXXX'}]})
+    types = current_app.config['ATTR_TYPES'].values()
+    return render_template('create.html', types=types)
