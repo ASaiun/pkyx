@@ -6,38 +6,21 @@
 {% block content %}
 {% include "comp/header.html" %}
     <div class="ui container" id="container">
-        <form action="" method="post" class="ui form">
+        <form action="{{ url_for('main.create_entry') }}" method="post" class="ui form">
+            {{ entry_form.csrf_token }}
             <div id="base">
                 <div class="ui horizontal divider"><h2><i class="tag icon"></i>基础</h2></div>
                 <div class="field">
-                  <label>名称</label>
-                  <input id="title" type="text" name="title">
+                  <label>{{ entry_form.title.label() }}</label>
+                  {{ entry_form.title() }}
                 </div>
                 <div class="field">
-                  <label>类型</label>
-                  <input id="type" type="text" name="type">
+                  <label>{{ entry_form.type.label() }}</label>
+                    {{ entry_form.type() }}
                 </div>
             </div>
 
             <br>
-            <div id="attributes">
-                <div class="ui horizontal divider"><h2><i class="tag icon"></i>属性</h2></div>
-
-            </div>
-
-            <br>
-            <div class="ui accordion">
-              <div class="title">
-                <a class=" ui icon button" id="add_attr">
-                  <i class="icon plus"></i>添加属性
-                </a>
-              </div>
-              <div class="content">
-                  {% for type in types %}
-                    <a href="#" class="type">{{type}}</a>
-                  {% endfor %}
-              </div>
-            </div>
 
             <button class="ui fluid teal button" type="submit">创建条目</button>
         </form>
@@ -45,18 +28,5 @@
     </div>
 {% endblock %}
 {% block js %}
-<script>
-    $(function(){
-        $('.ui.accordion').accordion();
-        var beginNode = '<div class="field">';
-        var endNode = '</div>'
-        $(".type").on({
-            click: function(ev) {
-                var beginNode = '<div class="field">';
-                var endNode = '</div>';
-                $("#attributes").append(beginNode + "<input type='text' name='attr_name'>" +endNode);
-            }
-        });
-    });
-</script>
+
 {% endblock %}

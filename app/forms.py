@@ -20,3 +20,6 @@ class RegisterForm(Form):
     repeat = PasswordField('重复密码', validators=[DataRequired()])
     submit = SubmitField('注册')
 
+class BaseEntryForm(Form):
+    title = StringField('名称', validators=[DataRequired()])
+    type = StringField('类型', validators=[DataRequired()])
