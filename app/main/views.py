@@ -49,6 +49,30 @@ def item(title):
     mongo.db['items'].update({'title': title}, {"$inc": {"view": 1}})
     return render_template('item.html', data=data, TypeRender=TypeRender)
 
+@main.route('/item/edit_attr', methods=['POST'])
+def edit_attr():
+    if request.method == 'POST':
+        title = request.form['title']
+        type = request.form['type']
+        attr = request.form['attr']
+        # mongo.db['items'].update(
+        #         {'title': title},
+        #         {
+        #             '$inc': {'attr_count': 1},
+        #             '$push':
+        #                 {
+        #                     'attributes':
+        #                         {
+        #                             'attr_name': title,
+        #                             'attr_value': attr,
+        #                             'attr_type': type
+        #                         }
+        #                 }
+        #         }
+        #     )
+    return redirect(url_for('.item', title=title))
+
+
 @main.route('/item/add_attr', methods=['POST'])
 def add_attr():
     if request.method == 'POST':

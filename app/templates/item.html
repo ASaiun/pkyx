@@ -32,8 +32,8 @@
         </a>
       </div>
       <div class="content">
-        <form action="" id="add_attr">
-          <div class="ui horizontal divider"><h3><i class="tag icon"></i>添加属性</h3></div>
+        <div class="ui horizontal divider"><h3><i class="tag icon"></i>添加属性</h3></div>
+        <form action="{{ url_for('main.edit')}}" id="add_attr">
           <div class="ui form">
             <div class="inline fields">
               <div class="field">
@@ -76,7 +76,9 @@
               </div>
             </div>
             <div class="ui tab" data-tab="bool">
-              <button id="bool" class="ui toggle button" type="button">否</button>
+              <div>
+                <button id="bool" class="ui toggle button" type="button">否</button>
+              </div>
             </div>
             <div class="ui tab" data-tab="star">
               <div id="star" class="ui massive star rating"></div>
@@ -103,15 +105,56 @@
 
     </div>
 </div>
+
+<div class="ui small modal" id="edit_modal">
+    <div class="header">编辑属性</div>
+    <div class="content">
+      <div class="ui form">
+        <div class="field" id="edit_field">
+        </div>
+      </div>
+      <button class="ui button fluid red" id="edit_remove">删除该行</button>
+    </div>
+    <div class="actions">
+      <div class="ui negative button">取消</div>
+      <div class="ui positive right labeled icon button" id="edit_submit">确认<i class="checkmark icon"></i> </div>
+    </div>
+  </div>
+
 {% endblock %}
 {% block js %}
+<script src="{{ url_for('static', filename='js/editable.js') }}"></script>
 <script>
     $(function(){
+//      $('table').editableTableWidget();
+      var post_form = $("#add_attr").clone();
+      $('table td').on('dblclick', function(evt){
+        var element = $(this);
+        var name = element.prev().text();
+        var value = element.text();
+        var type = element.parent().attr('data-type');
+        console.log(name);
+        console.log(value);
+        console.log(type);
+
+        $('#edit_field').html(post_form);
+
+        $('.modal #add_attr #attr_name').val(name);
+        $('.modal #add_attr #attr_name').attr('disabled', true);
+        $('.modal #tab .menu .item').tab({
+          context: 'parent'
+        });
+
+        $('#edit_modal').modal('show');
+
+      });
+
       $('.ui.accordion').accordion({
         onOpen: function() {
           $("html, body").animate({ scrollTop: $("#add_btn").offset().top }, 1000);
         }
       });
+
       $('#star').rating({
           initialRating: 3,
           maxRating: 5
@@ -146,7 +189,6 @@
           throw new RangeError();
         if(attr_value == undefined) value = "";
 
-        console.log(attr_value);
         $.ajax({
           url: "/item/add_attr",
           data: JSON.stringify({

@@ -10,7 +10,7 @@ def bson_obj_id(id):
 class TypeRender:
 
     _template = '''
-        <tr class="center aligned">
+        <tr class="center aligned" data-type="{type}">
           <td class="six wide">{name}</td>
           <td class="ten wide {attr_cls}">{attr}</td>
         </tr>
@@ -32,14 +32,14 @@ class TypeRender:
             content = cls._type['star'].format(v=int(attr_value) * cls._star_tmp)
         elif attr_type == 'bool':
             if attr_value is True or attr_value == 1:
-                return cls.render(attr_name, '是', hightlight='positive')
+                return cls.render(attr_name, '是', attr_type, hightlight='positive')
             else:
-                return cls.render(attr_name, '否', hightlight='negative')
+                return cls.render(attr_name, '否', attr_type, hightlight='negative')
         else:
             content = cls._type[attr_type].format(v=attr_value)
 
-        return cls.render(attr_name, content)
+        return cls.render(attr_name, content, attr_type)
 
     @classmethod
-    def render(cls, name, attr, hightlight=''):
-        return cls._template.format(name=name, attr=attr, attr_cls=hightlight)
+    def render(cls, name, attr, type, hightlight=''):
+        return cls._template.format(name=name, attr=attr, type=type, attr_cls=hightlight)
