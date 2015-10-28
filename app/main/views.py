@@ -1,11 +1,12 @@
 from app import mongo
 from app.forms import PkForm, LoginForm, BaseEntryForm
 from datetime import datetime
-from flask import render_template, request, flash, url_for, current_app, abort, redirect, jsonify
-from flask.ext.login import current_user
+from flask import render_template, request, flash, url_for, abort, redirect, jsonify
+from flask.ext.login import current_user, login_required
 from util import TypeRender
 
 from . import main
+import pymongo
 
 @main.route('/')
 def index():
@@ -27,6 +28,19 @@ def pk():
     flash('非法请求', 'WARNING')
     return render_template('pk.html')
 
+@main.route('/explore')
+def explore():
+    items = mongo.db['items'].find().limit(20).sort('created_at', pymongo.DESCENDING)
+    return render_template('explore.html', items=items)
+
+@main.route('/search')
+def search():
+    q = request.args.get('q', None)
+    if q is None:
+        abort(404)
+    list = mongo.db['items'].find({'title': {"$regex": q } }).limit(20).sort('created_at', pymongo.DESCENDING)
+    return render_template('explore.html', items=list)
+
 @main.route('/item/<title>')
 def item(title):
     data = mongo.db['items'].find_one({'title': title})
@@ -38,8 +52,8 @@ def item(title):
 @main.route('/item/add_attr', methods=['POST'])
 def add_attr():
     if request.method == 'POST':
-        title = request.json['title'].strip()
-        attr_name = request.json['attr_name']
+        title = request.json['title']
+        attr_name = request.json['attr_name'].strip()
         attr_type = request.json['attr_type']
         attr_value = request.json['attr_value']
         if attr_value is None:
@@ -65,6 +79,7 @@ def add_attr():
         return jsonify(status=True, reason="添加属性成功", html=html)
 
 @main.route('/create_entry', methods=['GET', 'POST'])
+@login_required
 def create_entry():
     entry_form = BaseEntryForm()
     if entry_form.validate_on_submit():

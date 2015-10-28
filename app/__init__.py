@@ -27,7 +27,7 @@ def create_app(config_name='dev'):
     mongo.init_app(app)
     # 初始化Flask-Login
     login_manager.init_app(app)
-    login_manager.login_view = 'users.login'
+    login_manager.login_view = 'main.index'
     login_manager.login_message = '请登录'
 
     from app.main import main as main_blueprint

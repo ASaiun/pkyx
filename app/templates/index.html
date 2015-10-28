@@ -25,4 +25,10 @@
 {% endblock %}
 {% block js %}
 <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+<script>
+    $(function(){
+        $('#login').login();
+
+    });
+</script>
 {% endblock %}

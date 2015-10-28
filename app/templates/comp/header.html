@@ -1,10 +1,10 @@
 <div class="ui teal top pointing fixed inverted menu">
   <div class="ui container">
       <a class="header item" href="/">pkyx</a>
-  <a class="item" href="#">发现</a>
+  <a class="item" href="{{ url_for('main.explore') }}">发现</a>
   <a class="item" href="#">专栏</a>
     <div class="item">
-        <form action="" method="get">
+        <form action="{{ url_for('main.search') }}" method="get">
             <div class="ui search">
                 <div class="ui icon input">
                   <i class="search icon"></i>

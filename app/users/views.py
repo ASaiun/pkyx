@@ -4,25 +4,35 @@ from app.models import User
 from flask import render_template, redirect, url_for, request, flash, jsonify
 from flask.ext.login import login_required, login_user, logout_user
 
+from util import bson_obj_id
+
 from . import users
 
-@users.route('/register', methods=['GET', 'POST'])
+@users.route('/sign_up', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
-    if form.validate_on_submit():
-        email = form.email.data
-        uname = form.username.data
-        passwd = form.password.data
-        rp_passwd = form.repeat.data
-        if passwd != rp_passwd:
-            flash('两次密码不相同', 'WARNING')
-        elif mongo.db.users.find_one({'email':email}) is not None:
-            flash('该邮箱已被注册', 'WARNING')
+    lg_form = LoginForm()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            email = form.email.data
+            uname = form.username.data
+            passwd = form.password.data
+            rp_passwd = form.repeat.data
+            if passwd != rp_passwd:
+                flash('两次密码不相同', 'WARNING')
+            elif mongo.db.users.find_one({'email':email}) is not None:
+                flash('该邮箱已被注册', 'WARNING')
+            else:
+                id = mongo.db.users.insert({'email':email, 'username':uname, 'password': User.gen_passwd_hash(passwd)})
+                if id is not None:
+                    user = User(bson_obj_id(id))
+                    login_user(user)
+                    return redirect(url_for('main.index'))
+                flash('注册失败', 'WARNING')
         else:
-            mongo.db.users.insert({'email':email, 'username':uname, 'password': User.gen_passwd_hash(passwd)})
-            flash('注册成功', 'SUCCESS')
-            return redirect(url_for('main.index'))
-    return render_template('register.html', form=form)
+            for field, error in form.errors.items():
+                flash("%s: %s" %(getattr(form, field).label.text, error), 'WARNING')
+    return render_template('register.html', form=form, lg_form=lg_form)
 
 @users.route('/login', methods=['POST'])
 def login():

@@ -1,12 +1,15 @@
 /**
  * Created by tonnie on 15/10/25.
  */
-$(function(){
-       $("#login").on({
-           click: function(ev) {
+(function($, document){
+    $.fn.login = function(options) {
+        var selector = "#" + $(this).attr("id");
+
+        $(document).on("click", selector, function(ev) {
                $('.ui.modal').modal('show');
            }
-       });
+       );
+
         $("#lg_form").on({
             submit: function(ev) {
                 ev.preventDefault();
@@ -34,4 +37,5 @@ $(function(){
                 })
             }
         });
-    });
+    }
+}(jQuery, document));

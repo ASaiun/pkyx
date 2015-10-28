@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+<title>发现</title>
+{% endblock %}
+{% block content %}
+{% include "comp/header.html" %}
+<div class="ui container" id="container">
+    {% for item in items %}
+    <a href="{{ url_for('main.item', title=item.title) }}">{{item.title}}</a>
+    {% endfor %}
+</div>
+{% endblock %}
+{% block js %}
+
+{% endblock %}

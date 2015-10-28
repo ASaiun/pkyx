@@ -12,6 +12,12 @@
 
 div {display:block;}
 
+body {
+  background-color: #f1f5f8;
+}
+
 #container {
+    background-color: #ffffff;
+    padding: 1em;
     margin-top: 100px;
 }
