@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block head %}
 {{ super() }}
-<title>{{ title }}</title>
+<title>{{ data.title }}</title>
 {% endblock %}
 {% block content %}
 {% include "comp/header.html" %}
@@ -11,19 +11,16 @@
   <thead>
     <tr class="center aligned">
       <th></th>
-      <th>{{ data.title }}</th>
+      <th id="title">{{ data.title }}</th>
     </tr>
   </thead>
-  <tbody>
+  <tbody id="attr_body">
   <tr class="center aligned">
     <td class="six wide">类型</td>
     <td class="ten wide">{{ data.type }}</td>
   </tr>
   {% for d in data.attributes %}
-    <tr class="center aligned">
-      <td class="six wide">{{ d.key }}</td>
-      <td class="ten wide">{{ d.attr }}</td>
-    </tr>
+    {{ TypeRender.render_html(d.attr_name, d.attr_value, d.attr_type)|safe }}
   {% endfor %}
 
   </tbody>
@@ -35,111 +32,145 @@
         </a>
       </div>
       <div class="content">
-        <div class="ui horizontal divider"><h3><i class="list icon"></i>属性名</h3></div>
-        <div class="ui fluid icon input">
-          <input id="attr_name" type="text" placeholder="属性名...">
-        </div>
-        <div class="ui horizontal divider"><h3><i class="tag icon"></i>属性类型</h3></div>
-        <div id="tab">
-          <div class="ui secondary menu">
-            <a class="item red button type active" data-tab="text">文本</a>
-            <a class="item orange button type" data-tab="img">图片</a>
-            <a class="item yellow button type" data-tab="url">超链接</a>
-            <a class="item olive button type" data-tab="bool">是/否</a>
-            <a class="item green button type" data-tab="star">星级</a>
-            <a class="item teal button type" data-tab="num">数值</a>
-          </div>
-
-          <div class="ui tab active" data-tab="text">
-            <div class="ui form">
+        <form action="" id="add_attr">
+          <div class="ui horizontal divider"><h3><i class="tag icon"></i>添加属性</h3></div>
+          <div class="ui form">
+            <div class="inline fields">
               <div class="field">
-                <textarea id="text"></textarea>
+                <label>属性名</label>
+                <input id="attr_name" type="text" placeholder="在此输入属性名..." maxlength="16" required>
               </div>
             </div>
           </div>
 
-          <div class="ui tab" data-tab="img">
-            <div class="ui labeled fluid input">
-              <div class="ui label">图片URL</div>
-              <input id="img" type="url" placeholder="http://...">
+          <br>
+
+          <div id="tab">
+            <div class="ui secondary menu">
+              <a class="item red button type active" data-tab="text">文本</a>
+              <a class="item orange button type" data-tab="img">图片</a>
+              <a class="item yellow button type" data-tab="url">超链接</a>
+              <a class="item olive button type" data-tab="bool">是/否</a>
+              <a class="item green button type" data-tab="star">星级</a>
+              <a class="item teal button type" data-tab="num">数值</a>
             </div>
-          </div>
-          <div class="ui tab" data-tab="url">
-            <div class="ui labeled fluid input">
-              <div class="ui label">超链接</div>
-              <input id="url" type="url" placeholder="http://...">
-            </div>
-          </div>
-          <div class="ui tab" data-tab="bool">
-            <button id="bool" class="ui toggle button">否</button>
-          </div>
-          <div class="ui tab" data-tab="star">
-            <div id="star" class="ui massive star rating"></div>
-          </div>
-          <div class="ui tab" data-tab="num">
-            <div class="ui action input">
-              <input id="num" type="number" placeholder="输入数值...">
-              <select class="ui compact selection dropdown">
-                <option value="weight">重量</option>
-                <option value="length">长度</option>
-                <option value="area">面积</option>
-                <option value="currency">货币</option>
-              </select>
-              <select class="ui compact selection dropdown" id="num-unit">
-                <option value="all"> </option>
-              </select>
+            <div id="reason" class="ui red message" style="display:none;"></div>
+            <div class="ui tab active" data-tab="text">
+              <div class="ui form">
+                <div class="field">
+                  <textarea id="text"></textarea>
+                </div>
+              </div>
             </div>
 
+            <div class="ui tab" data-tab="img">
+              <div class="ui labeled fluid input">
+                <div class="ui label">图片URL</div>
+                <input id="img" type="url" placeholder="http://...">
+              </div>
+            </div>
+            <div class="ui tab" data-tab="url">
+              <div class="ui labeled fluid input">
+                <div class="ui label">超链接</div>
+                <input id="url" type="url" placeholder="http://...">
+              </div>
+            </div>
+            <div class="ui tab" data-tab="bool">
+              <button id="bool" class="ui toggle button" type="button">否</button>
+            </div>
+            <div class="ui tab" data-tab="star">
+              <div id="star" class="ui massive star rating"></div>
+            </div>
+            <div class="ui tab" data-tab="num">
+              <div class="ui action input">
+                <input id="num" type="number" placeholder="输入数值...">
+                <select class="ui compact selection dropdown">
+                  <option value="weight">重量</option>
+                  <option value="length">长度</option>
+                  <option value="area">面积</option>
+                  <option value="currency">货币</option>
+                </select>
+                <select class="ui compact selection dropdown" id="num-unit">
+                  <option value="all"> </option>
+                </select>
+              </div>
+
+            </div>
           </div>
+          <button id="add_btn" type="submit" class="ui teal button fluid" style="margin:1em 0;">添加</button>
+        </form>
         </div>
-        <button id="add_attr" class="ui teal button fluid" style="margin:1em 0;">添加</button>
-      </div>
+
     </div>
 </div>
 {% endblock %}
 {% block js %}
 <script>
     $(function(){
-      $('.ui.accordion').accordion();
-      $('#star')
-        .rating({
+      $('.ui.accordion').accordion({
+        onOpen: function() {
+          $("html, body").animate({ scrollTop: $("#add_btn").offset().top }, 1000);
+        }
+      });
+      $('#star').rating({
           initialRating: 3,
           maxRating: 5
         });
 
-      $('.ui.toggle.button')
-      .state({
+      $('#bool').state({
         text: {
           inactive : '否',
           active   : '是'
         }
       });
 
-      $('#tab .menu .item')
-        .tab({
+      $('#tab .menu .item').tab({
           context: 'parent'
         });
 
-      $("#add_attr").on("click", function(ev) {
+      $("#add_attr").on("submit", function(ev) {
+        ev.preventDefault();
         var active_tab = $('.ui.tab.active');
+        var title = $("#title").text();
+        var attr_name = $("#attr_name").val();
         var type = active_tab.attr('data-tab');
-        var value = null;
-        if (type == 'text')
-          value = $("#text").val();
-        else if (type == 'img')
-          value = $("#img").val();
-        else if (type == 'url')
-          value = $("#url").val();
-        else if (type == 'bool')
-          value = $("#bool").hasClass('active');
-        else if (type == 'star')
-          value = $('#star').rating("get rating");
-        else if (type == 'num')
-          value = $('#num').val() + $('num-unit').val();
+        var attr_value = null;
+
+        if (type == 'text') attr_value = $("#text").val();
+        else if (type == 'img') attr_value = $("#img").val();
+        else if (type == 'url') attr_value = $("#url").val();
+        else if (type == 'bool') attr_value = $("#bool").hasClass('active');
+        else if (type == 'star') attr_value = $('#star').rating("get rating");
+        else if (type == 'num') attr_value = $('#num').val() + $('num-unit').val();
         else
           throw new RangeError();
-        if(value == undefined) value = "";
-        console.log(value);
+        if(attr_value == undefined) value = "";
+
+        console.log(attr_value);
+        $.ajax({
+          url: "/item/add_attr",
+          data: JSON.stringify({
+            "attr_name": attr_name,
+            "attr_type": type,
+            "attr_value": attr_value,
+            "title": title
+          }),
+          type: "POST",
+          contentType:"application/json",
+          success: function(resp) {
+            if (resp.status == true) {
+              $("#attr_body").append(resp.html);
+              $('#reason').css('display', 'none');
+            } else {
+              $('#reason').html(resp.reason).css('display', 'block');
+            }
+          },
+          error: function(xhr, error, exp) {
+
+          }
+
+        });
+
       });
     });
 </script>
