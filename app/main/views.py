@@ -1,5 +1,5 @@
 from app import mongo
-from app.forms import PkForm, LoginForm, BaseEntryForm
+from app.forms import LoginForm, BaseEntryForm
 from datetime import datetime
 from flask import render_template, request, flash, url_for, abort, redirect, jsonify
 from flask.ext.login import current_user, login_required
@@ -11,23 +11,23 @@ import pymongo
 
 @main.route('/')
 def index():
-    pk_form = PkForm()
     lg_form = LoginForm()
-    return render_template('index.html', pk_form=pk_form, lg_form=lg_form)
+    return render_template('index.html', lg_form=lg_form)
 
 
 @main.route('/pk', methods=['GET', 'POST'])
 def pk():
-    pk_form = PkForm(request.form)
-    if pk_form.validate_on_submit():
-        pk1_name = request.form.get('pk1').strip()
-        pk2_name = request.form.get('pk2').strip()
-        pk1_data = mongo.db['items'].find({'title': pk1_name})
-        pk2_data = mongo.db['items'].find({'title': pk2_name})
-        flash('查询成功', 'SUCCESS')
-        return render_template('pk.html', pk1=pk1_name, pk2=pk2_name)
-    flash('非法请求', 'WARNING')
-    return render_template('pk.html')
+    if request.method == 'POST':
+        pk_str = request.form.get('pk').strip().replace('PK', 'pk')
+        pk_arr = pk_str.split('pk')
+        if len(pk_arr) == 2:
+            pk1_title, pk2_title = pk_arr
+            pk1_data = mongo.db['items'].find({'title': pk1_title.strip()})
+            pk2_data = mongo.db['items'].find({'title': pk2_title.strip()})
+            return render_template('pk.html', pk1=pk1_title, pk2=pk2_title)
+        else:
+            flash('非法输入', 'index')
+    return redirect(url_for('.index'))
 
 @main.route('/explore')
 def explore():
@@ -50,6 +50,8 @@ def search():
     if q is None:
         abort(404)
     list = mongo.db['items'].find({'title': {"$regex": q } }).limit(20).sort('created_at', pymongo.DESCENDING)
+    if list.count() == 0:
+        flash('没有找到结果', 'search')
     return render_template('explore.html', items=list)
 
 @main.route('/item/<title>')

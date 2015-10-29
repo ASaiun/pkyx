@@ -20,7 +20,7 @@
 <div class="ui middle aligned center aligned grid">
   <div class="column">
     <h2 class="ui teal image header">
-      <img src="" class="image">
+      <img src="/static/img/logo2.png" class="image">
       <div class="content">
         注册到PKYX
       </div>
@@ -29,7 +29,10 @@
          {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
             {% for category, message in messages %}
-                <div class="ui red message">{{ message }}</div>
+                <div class="ui red message">
+                  <i class="close icon"></i>
+                  <div class="header">{{ message }}</div>
+                </div>
             {% endfor %}
           {% endif %}
         {% endwith %}

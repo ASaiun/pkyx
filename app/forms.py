@@ -19,11 +19,6 @@ validators = {
     ]
 }
 
-class PkForm(Form):
-    pk1 = StringField(validators=[DataRequired()])
-    pk2 = StringField(validators=[DataRequired()])
-    submit = SubmitField('pk一下')
-
 class LoginForm(Form):
     email = EmailField('邮箱', validators=[DataRequired()])
     password = PasswordField('密码', validators=[DataRequired()])

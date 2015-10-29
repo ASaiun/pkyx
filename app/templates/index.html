@@ -2,24 +2,50 @@
 {% block head %}
 {{ super() }}
 <title>首页</title>
-{% endblock %}
+<style>
+    body {
+        background: url(/static/img/bg.jpg) no-repeat;
+        background-size: 100% 100%;
+        overflow:hidden;
+    }
 
+    #pk {
+        position:relative;
+        max-width: 700px;
+        margin: 200px auto;
+        padding: 100px;
+    }
+
+    .ui.message {
+        position: absolute;
+        margin-left: auto;
+        margin-right: auto;
+        left: 0;
+        right: 0;
+        width:50%;
+        top: 10%;
+    }
+</style>
+{% endblock %}
 {% block content %}
 {% include 'comp/header.html' %}
 {% include 'comp/login.html' %}
-<div class="ui container" id="container">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <li class="{{ category }}">{{ message }}</li>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-    <form action="{{ url_for('.pk') }}" method="post" id="pk_form">
-        {{ pk_form.csrf_token }}
-        {{ pk_form.pk1() }}
-        {{ pk_form.pk2() }}
-        {{ pk_form.submit() }}
+{% with messages = get_flashed_messages(category_filter=["index"]) %}
+    {% if messages %}
+      {% for  message in messages %}
+          <div class="ui red message">
+            <i class="close icon"></i>
+            <div class="header">{{ message }}</div>
+          </div>
+      {% endfor %}
+    {% endif %}
+{% endwith %}
+<div class="" id="pk">
+    <form class="ui form" action="{{ url_for('.pk') }}" method="post" id="pk_form">
+        <div class="ui fluid action input">
+          <input name="pk" type="text" placeholder="例如:甜豆腐脑 pk 咸豆腐脑...">
+          <button class="ui teal button" type="submit">PK一下</button>
+        </div>
     </form>
 </div>
 {% endblock %}

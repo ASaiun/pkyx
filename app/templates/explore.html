@@ -6,6 +6,16 @@
 {% block content %}
 {% include "comp/header.html" %}
 <div class="ui container" id="container">
+    {% with messages = get_flashed_messages(category_filter=["search", "explore"]) %}
+        {% if messages %}
+          {% for  message in messages %}
+              <div class="ui red message">
+                <i class="close icon"></i>
+                <div class="header">{{ message }}</div>
+              </div>
+          {% endfor %}
+        {% endif %}
+    {% endwith %}
     <div class="ui six doubling cards">
         {% for item in items %}
             <div class="ui card">
