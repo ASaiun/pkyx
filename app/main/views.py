@@ -3,6 +3,7 @@ from app.forms import PkForm, LoginForm, BaseEntryForm
 from datetime import datetime
 from flask import render_template, request, flash, url_for, abort, redirect, jsonify
 from flask.ext.login import current_user, login_required
+from random import randint
 from util import TypeRender
 
 from . import main
@@ -33,6 +34,16 @@ def explore():
     items = mongo.db['items'].find().limit(20).sort('created_at', pymongo.DESCENDING)
     return render_template('explore.html', items=items)
 
+@main.route('/lucky')
+def lucky():
+    # 总条数
+    N = mongo.db['items'].count()
+    item = mongo.db['items'].find().limit(1).skip(randint(0, N-1))[0]
+    print(item)
+    if item:
+        return redirect(url_for('.item', title=item['title']))
+    return redirect(url_for('.index'))
+
 @main.route('/search')
 def search():
     q = request.args.get('q', None)
@@ -52,25 +63,49 @@ def item(title):
 @main.route('/item/edit_attr', methods=['POST'])
 def edit_attr():
     if request.method == 'POST':
-        title = request.form['title']
-        type = request.form['type']
-        attr = request.form['attr']
-        # mongo.db['items'].update(
-        #         {'title': title},
-        #         {
-        #             '$inc': {'attr_count': 1},
-        #             '$push':
-        #                 {
-        #                     'attributes':
-        #                         {
-        #                             'attr_name': title,
-        #                             'attr_value': attr,
-        #                             'attr_type': type
-        #                         }
-        #                 }
-        #         }
-        #     )
-    return redirect(url_for('.item', title=title))
+        title = request.json['title']
+        attr_name = request.json['attr_name']
+        attr_type = request.json['attr_type']
+        attr_value = request.json['attr_value']
+        if attr_value is None:
+            return jsonify(status=False, reason="属性值不能为空")
+        result = mongo.db['items'].update(
+                {'title': title, "attributes.attr_name": attr_name},
+                {
+                    '$set':
+                        {
+                            'attributes.$':
+                                {
+                                    'attr_name': attr_name,
+                                    'attr_value': attr_value,
+                                    'attr_type': attr_type
+                                }
+                        }
+                }
+            )
+        if result:
+            return jsonify(status=True, reason="修改属性成功")
+        else:
+            return jsonify(status=True, reason="修改失败")
+
+@main.route('/item/del_attr', methods=['POST'])
+def del_attr():
+    if request.method == 'POST':
+        title = request.json['title']
+        attr_name = request.json['attr_name']
+        result = mongo.db['items'].update(
+                {'title': title},
+                {
+                    '$pull':
+                    {
+                        'attributes': {'attr_name': attr_name}
+                    }
+                }
+            )
+        if result:
+            return jsonify(status=True, reason="删除属性成功")
+        else:
+            return jsonify(status=True, reason="删除失败")
 
 
 @main.route('/item/add_attr', methods=['POST'])
@@ -115,7 +150,7 @@ def create_entry():
             'attributes':[],
             'attr_count': 1,
             'view': 0,
-            'created_at': datetime.now(),
+            'created_at': datetime.utcnow(),
             'created_by': current_user.id
         })
         return redirect(url_for('.item', title=title))

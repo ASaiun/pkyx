@@ -6,9 +6,21 @@
 {% block content %}
 {% include "comp/header.html" %}
 <div class="ui container" id="container">
-    {% for item in items %}
-    <a href="{{ url_for('main.item', title=item.title) }}">{{item.title}}</a>
-    {% endfor %}
+    <div class="ui six doubling cards">
+        {% for item in items %}
+            <div class="ui card">
+              <div class="content">
+                <div class="header">
+                    <a href="{{ url_for('main.item', title=item.title) }}">{{item.title}}</a>
+                </div>
+                <div class="meta">{{ item.created_at.strftime('%Y-%m-%d') }}</div>
+                <div class="description">
+                  {{ item.type }}
+                </div>
+              </div>
+            </div>
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}
 {% block js %}

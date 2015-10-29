@@ -25,7 +25,7 @@
 
   </tbody>
 </table>
-    <div class="ui accordion">
+    <div class="ui accordion" id="bottom_bar">
       <div class="title">
         <a class=" ui icon teal button">
           <i class="icon plus"></i>添加属性
@@ -33,74 +33,72 @@
       </div>
       <div class="content">
         <div class="ui horizontal divider"><h3><i class="tag icon"></i>添加属性</h3></div>
-        <form action="{{ url_for('main.edit')}}" id="add_attr">
-          <div class="ui form">
-            <div class="inline fields">
-              <div class="field">
-                <label>属性名</label>
-                <input id="attr_name" type="text" placeholder="在此输入属性名..." maxlength="16" required>
-              </div>
-            </div>
-          </div>
-
-          <br>
-
-          <div id="tab">
-            <div class="ui secondary menu">
-              <a class="item red button type active" data-tab="text">文本</a>
-              <a class="item orange button type" data-tab="img">图片</a>
-              <a class="item yellow button type" data-tab="url">超链接</a>
-              <a class="item olive button type" data-tab="bool">是/否</a>
-              <a class="item green button type" data-tab="star">星级</a>
-              <a class="item teal button type" data-tab="num">数值</a>
-            </div>
-            <div id="reason" class="ui red message" style="display:none;"></div>
-            <div class="ui tab active" data-tab="text">
-              <div class="ui form">
+          <form id="add_attr">
+            <div class="ui form">
+              <div class="inline fields">
                 <div class="field">
-                  <textarea id="text"></textarea>
+                  <label>属性名</label>
+                  <input id="attr_name" type="text" placeholder="在此输入属性名..." maxlength="16" required>
                 </div>
               </div>
             </div>
-
-            <div class="ui tab" data-tab="img">
-              <div class="ui labeled fluid input">
-                <div class="ui label">图片URL</div>
-                <input id="img" type="url" placeholder="http://...">
+            <br>
+            <div id="tab">
+              <div class="ui secondary menu">
+                <a class="item red button type active" data-tab="text">文本</a>
+                <a class="item orange button type" data-tab="img">图片</a>
+                <a class="item yellow button type" data-tab="url">超链接</a>
+                <a class="item olive button type" data-tab="bool">是/否</a>
+                <a class="item green button type" data-tab="star">星级</a>
+                <a class="item teal button type" data-tab="num">数值</a>
               </div>
-            </div>
-            <div class="ui tab" data-tab="url">
-              <div class="ui labeled fluid input">
-                <div class="ui label">超链接</div>
-                <input id="url" type="url" placeholder="http://...">
-              </div>
-            </div>
-            <div class="ui tab" data-tab="bool">
-              <div>
-                <button id="bool" class="ui toggle button" type="button">否</button>
-              </div>
-            </div>
-            <div class="ui tab" data-tab="star">
-              <div id="star" class="ui massive star rating"></div>
-            </div>
-            <div class="ui tab" data-tab="num">
-              <div class="ui action input">
-                <input id="num" type="number" placeholder="输入数值...">
-                <select class="ui compact selection dropdown">
-                  <option value="weight">重量</option>
-                  <option value="length">长度</option>
-                  <option value="area">面积</option>
-                  <option value="currency">货币</option>
-                </select>
-                <select class="ui compact selection dropdown" id="num-unit">
-                  <option value="all"> </option>
-                </select>
+              <div id="reason" class="ui red message" style="display:none;"></div>
+              <div class="ui tab active" data-tab="text">
+                <div class="ui form">
+                  <div class="field">
+                    <textarea id="text"></textarea>
+                  </div>
+                </div>
               </div>
 
+              <div class="ui tab" data-tab="img">
+                <div class="ui labeled fluid input">
+                  <div class="ui label">图片URL</div>
+                  <input id="img" type="url" placeholder="http://...">
+                </div>
+              </div>
+              <div class="ui tab" data-tab="url">
+                <div class="ui labeled fluid input">
+                  <div class="ui label">超链接</div>
+                  <input id="url" type="url" placeholder="http://...">
+                </div>
+              </div>
+              <div class="ui tab" data-tab="bool">
+                <div>
+                  <button id="bool" class="ui toggle button" type="button">否</button>
+                </div>
+              </div>
+              <div class="ui tab" data-tab="star">
+                <div id="star" class="ui massive star rating"></div>
+              </div>
+              <div class="ui tab" data-tab="num">
+                <div class="ui action input">
+                  <input id="num" type="number" placeholder="输入数值...">
+                  <select class="ui compact selection dropdown">
+                    <option value="weight">重量</option>
+                    <option value="length">长度</option>
+                    <option value="area">面积</option>
+                    <option value="currency">货币</option>
+                  </select>
+                  <select class="ui compact selection dropdown" id="num-unit">
+                    <option value="all"> </option>
+                  </select>
+                </div>
+
+              </div>
             </div>
-          </div>
-          <button id="add_btn" type="submit" class="ui teal button fluid" style="margin:1em 0;">添加</button>
-        </form>
+            <button id="add_btn" type="submit" class="ui teal button fluid" style="margin:1em 0;">添加</button>
+          </form>
         </div>
 
     </div>
@@ -113,38 +111,119 @@
         <div class="field" id="edit_field">
         </div>
       </div>
-      <button class="ui button fluid red" id="edit_remove">删除该行</button>
+      <button class="ui button fluid red" id="del_btn">删除该行</button>
     </div>
-    <div class="actions">
-      <div class="ui negative button">取消</div>
-      <div class="ui positive right labeled icon button" id="edit_submit">确认<i class="checkmark icon"></i> </div>
-    </div>
+
   </div>
 
 {% endblock %}
 {% block js %}
-<script src="{{ url_for('static', filename='js/editable.js') }}"></script>
 <script>
     $(function(){
-//      $('table').editableTableWidget();
-      var post_form = $("#add_attr").clone();
-      $('table td').on('dblclick', function(evt){
-        var element = $(this);
-        var name = element.prev().text();
-        var value = element.text();
-        var type = element.parent().attr('data-type');
-        console.log(name);
-        console.log(value);
-        console.log(type);
+      function init_type(selector) {
+        var parent = null;
+        if(selector == undefined) parent = $(document);
+        else parent = $(selector);
 
-        $('#edit_field').html(post_form);
+        parent.find('#star').rating({
+            initialRating: 3,
+            maxRating: 5
+          });
 
-        $('.modal #add_attr #attr_name').val(name);
-        $('.modal #add_attr #attr_name').attr('disabled', true);
-        $('.modal #tab .menu .item').tab({
-          context: 'parent'
+        parent.find('#bool').state({
+          text: {
+            inactive : '否',
+            active   : '是'
+          }
         });
 
+        parent.find('#tab .menu .item').tab({
+          context: 'parent'
+        });
+      }
+
+      function getValue(type, selector) {
+        var attr_value = null;
+        var parent = null;
+        if(selector == undefined) parent = $(document);
+        else parent = $(selector);
+
+        if (type == 'text') attr_value = parent.find("#text").val();
+        else if (type == 'img') attr_value = parent.find("#img").val();
+        else if (type == 'url') attr_value = parent.find("#url").val();
+        else if (type == 'bool') attr_value = parent.find("#bool").hasClass('active');
+        else if (type == 'star') attr_value = parent.find('#star').rating("get rating");
+        else if (type == 'num') attr_value = parent.find('#num').val() + $('num-unit').val();
+        else throw new Error();
+
+        return attr_value;
+      }
+
+      var post_form = $("#add_attr").clone();
+
+      $(document).on('dblclick','td', function(evt){
+          var element = $(this);
+          var title = $('#title').text();
+          var name = element.prev().text();
+
+          $('#edit_field').html(post_form);
+          var form = $('#edit_modal');
+
+          form.find('#add_attr #attr_name').val(name);
+          form.find('#add_attr #attr_name').attr('disabled', true);
+          form.find('#add_btn').on('click', function(){
+          var reason = form.find("#reason");
+          var type = form.find('.ui.tab.active').attr('data-tab');
+          var value = getValue(type, "#edit_modal");
+
+          $.ajax({
+              url: "/item/edit_attr",
+              data: JSON.stringify({
+                  "title": title,
+                  "attr_name": name,
+                  "attr_value": value,
+                  "attr_type": type
+              }),
+              type: "POST",
+              contentType:"application/json",
+              success: function(resp) {
+                if (resp.status == true) {
+                  location.reload();
+                } else {
+                  reason.html(resp.reason);
+                }
+              },
+              error: function(xhr, error, exp) {
+                alert("修改失败");
+              }
+
+          });
+        });
+
+        form.find('#del_btn').on('click', function(){
+          $.ajax({
+            url: "/item/del_attr",
+            data: JSON.stringify({
+                "title": title,
+                "attr_name": name,
+            }),
+            type: "POST",
+            contentType:"application/json",
+            success: function(resp) {
+              if(resp.status == true) {
+                location.reload();
+              } else {
+                reason.html(resp.reason);
+              }
+            },
+            error: function(xhr, error, exp) {
+              alert("删除失败");
+            }
+          });
+        });
+        // 渲染类型控件
+        init_type("#edit_modal");
+        // 淡出编辑框
         $('#edit_modal').modal('show');
 
       });
@@ -154,22 +233,8 @@
           $("html, body").animate({ scrollTop: $("#add_btn").offset().top }, 1000);
         }
       });
-
-      $('#star').rating({
-          initialRating: 3,
-          maxRating: 5
-        });
-
-      $('#bool').state({
-        text: {
-          inactive : '否',
-          active   : '是'
-        }
-      });
-
-      $('#tab .menu .item').tab({
-          context: 'parent'
-        });
+      // 渲染类型控件
+      init_type("#bottom_bar");
 
       $("#add_attr").on("submit", function(ev) {
         ev.preventDefault();
@@ -177,16 +242,8 @@
         var title = $("#title").text();
         var attr_name = $("#attr_name").val();
         var type = active_tab.attr('data-tab');
-        var attr_value = null;
+        var attr_value = getValue(type, "#bottom_bar");
 
-        if (type == 'text') attr_value = $("#text").val();
-        else if (type == 'img') attr_value = $("#img").val();
-        else if (type == 'url') attr_value = $("#url").val();
-        else if (type == 'bool') attr_value = $("#bool").hasClass('active');
-        else if (type == 'star') attr_value = $('#star').rating("get rating");
-        else if (type == 'num') attr_value = $('#num').val() + $('num-unit').val();
-        else
-          throw new RangeError();
         if(attr_value == undefined) value = "";
 
         $.ajax({
@@ -208,7 +265,7 @@
             }
           },
           error: function(xhr, error, exp) {
-
+            alert("添加失败");
           }
 
         });
