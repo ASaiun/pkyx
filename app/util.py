@@ -35,19 +35,50 @@ class TypeRender:
     _star_tmp = '<i class="icon active"></i>'
 
     @classmethod
-    def render_html(cls, attr_name, attr_value, attr_type):
-        if attr_type == 'star':
-            content = cls._type['star'].format(v=int(attr_value) * cls._star_tmp)
-        elif attr_type == 'bool':
-            if attr_value is True or attr_value == 1:
-                return cls.render(attr_name, '是', attr_type, hightlight='positive')
+    def _content_of_type(cls, value, type):
+        if type == 'star':
+            content = cls._type['star'].format(v=int(value) * cls._star_tmp)
+        elif type == 'bool':
+            if type is True or value == 1:
+                content = '是'
             else:
-                return cls.render(attr_name, '否', attr_type, hightlight='negative')
+                content = '否'
         else:
-            content = cls._type[attr_type].format(v=attr_value)
-
-        return cls.render(attr_name, content, attr_type)
+            content = cls._type[type].format(v=value)
+        return content
 
     @classmethod
-    def render(cls, name, attr, type, hightlight=''):
-        return cls._template.format(name=name, attr=attr, type=type, attr_cls=hightlight)
+    def _class_of_type(cls,value, type):
+        if type == 'bool':
+            if type is True or value == 1:
+                return 'positive'
+            else:
+                return 'negative'
+        return ''
+
+    @classmethod
+    def render_html(cls, attr_name, attr_value, attr_type):
+        content = cls._content_of_type(attr_value, attr_type)
+        td_class = cls._class_of_type(attr_value, attr_type)
+        return cls.render(attr_name, content, attr_type, td_class)
+
+    @classmethod
+    def render_many(cls, attr_name, attr_list):
+        begin = '<tr class="center aligned" "><td>{name}</td>'
+        td = '<td class="{attr_cls}">{attr}</td>'
+        end = '</tr>'
+
+        td_arr = []
+        for attr in attr_list:
+            if not attr:
+                td_arr.append(td.format(attr='?', attr_cls=''))
+            else:
+                td_arr.append(td.format(attr=cls._content_of_type(attr['attr_value'], attr['attr_type']), \
+                            attr_cls=cls._class_of_type(attr['attr_value'], attr['attr_type'])))
+
+        html = begin.format(name=attr_name, type='') + ''.join(td_arr) + end
+        return html
+
+    @classmethod
+    def render(cls, name, attr, type, td_class=''):
+        return cls._template.format(name=name, attr=attr, type=type, attr_cls=td_class)

@@ -91,7 +91,6 @@ def profile_edit():
             }
 
             avatar = request.files['avatar']
-            avatar_id = None
             if avatar and AllowFile.is_img(avatar.filename):
                 filename = secure_filename(avatar.filename)
                 fs = GridFS(mongo.db, collection="avatar")
@@ -125,7 +124,6 @@ def logout():
 @users.route('/static/avatar/<oid>')
 def avatar(oid):
     if oid is None:
-        print('oh')
         return ''
     try:
         fs = GridFS(mongo.db, "avatar")

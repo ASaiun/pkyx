@@ -23,7 +23,7 @@
 {% include 'comp/login.html' %}
 {% with messages = get_flashed_messages(category_filter=["index"]) %}
     {% if messages %}
-      {% for  message in messages %}
+      {% for message in messages %}
           <div class="ui red message msg-fixed-top" id="tip">
             <i class="close icon"></i>
             <div class="header">{{ message }}</div>
