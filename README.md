@@ -19,6 +19,7 @@ pkyx是基于Flask开发的一个比较网站，灵感来自于[VSChart](http://
 
 [Day 7：编写主功能](http://livevilwt.me/blog/article/63/)
 
+[Day 8：使用GridFS实现文件上传](http://livevilwt.me/blog/article/64/)
 
 ## 安装依赖
 ---

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block head %}
 {{ super() }}
-<title>发现</title>
+<title>{{title|with_site}}</title>
 {% endblock %}
 {% block content %}
 {% include "comp/header.html" %}

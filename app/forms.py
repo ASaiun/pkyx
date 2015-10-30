@@ -1,7 +1,7 @@
 from flask.ext.wtf import Form
-from flask.ext.wtf.html5 import EmailField
-from wtforms import StringField, SubmitField, PasswordField
-from wtforms.validators import DataRequired, Regexp, Length, EqualTo, Required
+from flask.ext.wtf.html5 import EmailField, URLField
+from wtforms import StringField, PasswordField, TextAreaField
+from wtforms.validators import DataRequired, Regexp, Length
 
 _required_text = '该字段为必填项'
 
@@ -33,3 +33,9 @@ class RegisterForm(Form):
 class BaseEntryForm(Form):
     title = StringField('名称', validators=[DataRequired()])
     type = StringField('类型', validators=[DataRequired()])
+
+class ProfileForm(Form):
+    username = StringField('呢称*', validators=validators['username'])
+    location = StringField('所在地区', validators=[Length(max=64)])
+    website = URLField('个人主页', validators=[Length(max=256)])
+    introduction = TextAreaField('个人简介', validators=[Length(max=1024)])

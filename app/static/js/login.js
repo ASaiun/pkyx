@@ -30,7 +30,7 @@
                         } else {
                             $("#error").html("<p>"+resp.reason+"</p>").show();
                         }
-                    }.bind(this),
+                    },
                     error: function(xhr, error, exp) {
 
                     }

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block head %}
 {{ super() }}
-<title>{{ data.title }}</title>
+<title>{{ item.title|with_site }}</title>
 {% endblock %}
 {% block content %}
 {% include "comp/header.html" %}
@@ -11,15 +11,15 @@
   <thead>
     <tr class="center aligned">
       <th></th>
-      <th id="title">{{ data.title }}</th>
+      <th id="title">{{ item.title }}</th>
     </tr>
   </thead>
   <tbody id="attr_body">
   <tr class="center aligned">
     <td class="six wide">类型</td>
-    <td class="ten wide">{{ data.type }}</td>
+    <td class="ten wide">{{ item.type }}</td>
   </tr>
-  {% for d in data.attributes %}
+  {% for d in item.attributes %}
     {{ TypeRender.render_html(d.attr_name, d.attr_value, d.attr_type)|safe }}
   {% endfor %}
 

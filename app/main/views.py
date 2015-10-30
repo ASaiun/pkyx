@@ -12,7 +12,7 @@ import pymongo
 @main.route('/')
 def index():
     lg_form = LoginForm()
-    return render_template('index.html', lg_form=lg_form)
+    return render_template('index.html', lg_form=lg_form, title='首页')
 
 
 @main.route('/pk', methods=['GET', 'POST'])
@@ -32,7 +32,7 @@ def pk():
 @main.route('/explore')
 def explore():
     items = mongo.db['items'].find().limit(20).sort('created_at', pymongo.DESCENDING)
-    return render_template('explore.html', items=items)
+    return render_template('explore.html', items=items, title='发现')
 
 @main.route('/lucky')
 def lucky():
@@ -56,11 +56,11 @@ def search():
 
 @main.route('/item/<title>')
 def item(title):
-    data = mongo.db['items'].find_one({'title': title})
-    if not data:
+    item = mongo.db['items'].find_one({'title': title})
+    if not item:
         abort(404)
     mongo.db['items'].update({'title': title}, {"$inc": {"view": 1}})
-    return render_template('item.html', data=data, TypeRender=TypeRender)
+    return render_template('item.html', item=item, TypeRender=TypeRender)
 
 @main.route('/item/edit_attr', methods=['POST'])
 def edit_attr():
@@ -156,4 +156,5 @@ def create_entry():
             'created_by': current_user.id
         })
         return redirect(url_for('.item', title=title))
-    return render_template('create.html', entry_form=entry_form)
+    return render_template('create.html', entry_form=entry_form, title='创建条目')
+

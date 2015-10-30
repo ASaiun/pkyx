@@ -1,5 +1,5 @@
 #-*- coding:utf-8 -*-
-from flask import Flask
+from flask import Flask, g
 from flask.ext.pymongo import PyMongo
 from flask.ext.login import LoginManager
 from app.config import config
@@ -20,6 +20,9 @@ def load_user(user_id):
 
 def create_app(config_name='dev'):
     app = Flask(__name__)
+    # sifn = show if none
+    app.jinja_env.filters['sifn'] = lambda it: '无' if not it else it
+    app.jinja_env.filters['with_site'] = lambda title: title + ' - pkyx'
     # 导入配置
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
@@ -27,8 +30,8 @@ def create_app(config_name='dev'):
     mongo.init_app(app)
     # 初始化Flask-Login
     login_manager.init_app(app)
-    login_manager.login_view = 'main.index'
-    login_manager.login_message = '请登录'
+    login_manager.login_view = 'main.register'
+    login_manager.login_message = '请先登录或注册'
 
     from app.main import main as main_blueprint
     app.register_blueprint(main_blueprint)

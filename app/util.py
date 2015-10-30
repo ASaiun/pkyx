@@ -7,6 +7,14 @@ def bson_to_json(data):
 def bson_obj_id(id):
     return ObjectId(id)
 
+class AllowFile:
+    IMG_EXTENSIONS = set(['jpg', 'png', 'jpeg', 'bmp'])
+
+    @classmethod
+    def is_img(cls, filename):
+        return '.' in filename and \
+            filename.rsplit('.', 1)[1] in cls.IMG_EXTENSIONS
+
 class TypeRender:
 
     _template = '''
