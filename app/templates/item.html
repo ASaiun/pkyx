@@ -84,17 +84,9 @@
               <div class="ui tab" data-tab="num">
                 <div class="ui action input">
                   <input id="num" type="number" placeholder="输入数值...">
-                  <select class="ui compact selection dropdown">
-                    <option value="weight">重量</option>
-                    <option value="length">长度</option>
-                    <option value="area">面积</option>
-                    <option value="currency">货币</option>
-                  </select>
-                  <select class="ui compact selection dropdown" id="num-unit">
-                    <option value="all"> </option>
-                  </select>
+                  <select class="ui compact selection dropdown" id="val-type" required></select>
+                  <select class="ui compact selection dropdown" id="val-unit" required></select>
                 </div>
-
               </div>
             </div>
             <button id="add_btn" type="submit" class="ui teal button fluid" style="margin:1em 0;">添加</button>
@@ -118,6 +110,7 @@
 
 {% endblock %}
 {% block js %}
+<script src="{{ url_for('static', filename='js/select.js') }}"></script>
 <script>
     $(function(){
       function init_type(selector) {
@@ -140,6 +133,25 @@
         parent.find('#tab .menu .item').tab({
           context: 'parent'
         });
+
+        $.each(UNIT.TYPE, function(idx, type){
+           parent.find('#val-type')
+             .append($("<option></option>")
+             .attr("value",type.mapping)
+             .text(type.name));
+        });
+
+        parent.find('#val-type').on('change', function(evt){
+            parent.find('#val-unit').find('option').remove();
+            var type = evt.target.value;
+            $.each(UNIT.choose(type), function(idx, val){
+              parent.find('#val-unit')
+               .append($("<option></option>")
+               .attr("value",idx)
+               .text(val));
+            });
+        });
+
       }
 
       function getValue(type, selector) {
@@ -153,13 +165,15 @@
         else if (type == 'url') attr_value = parent.find("#url").val();
         else if (type == 'bool') attr_value = parent.find("#bool").hasClass('active');
         else if (type == 'star') attr_value = parent.find('#star').rating("get rating");
-        else if (type == 'num') attr_value = parent.find('#num').val() + $('num-unit').val();
+        else if (type == 'num') attr_value = parent.find('#num').val() + " " + parent.find( "#val-unit option:selected" ).text();
         else throw new Error();
 
         return attr_value;
       }
 
+      //      偷个懒
       var post_form = $("#add_attr").clone();
+      post_form.find("#add_btn").text("确认修改")
 
       $(document).on('dblclick','td', function(evt){
           var element = $(this);

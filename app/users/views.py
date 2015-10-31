@@ -94,7 +94,6 @@ def profile_edit():
             if avatar and AllowFile.is_img(avatar.filename):
                 filename = secure_filename(avatar.filename)
                 fs = GridFS(mongo.db, collection="avatar")
-                fs.find()
                 avatar_id = fs.put(avatar, content_type=avatar.content_type, filename=filename)
                 if avatar_id:
                     if user['avatar']:

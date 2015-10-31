@@ -2,12 +2,10 @@ from app import mongo
 from app.forms import LoginForm, BaseEntryForm
 from collections import defaultdict
 from datetime import datetime
-from itertools import groupby
-from operator import itemgetter
 from flask import render_template, request, flash, url_for, abort, redirect, jsonify
 from flask.ext.login import current_user, login_required
 from random import randint
-from util import TypeRender
+from util import TypeRender, bson_obj_id
 
 from . import main
 import pymongo
@@ -18,17 +16,18 @@ def index():
     lg_form = LoginForm()
     return render_template('index.html', lg_form=lg_form, title='首页')
 
+pk_regx = re.compile(r'(\w+)\s+(pk|Pk|pK|PK)\s+(\w+)', re.IGNORECASE)
 
 @main.route('/pk', methods=['GET', 'POST'])
 def pk():
     if request.method == 'POST':
-        pk_str = request.form.get('pk').strip().replace('PK', 'pk')
-        pk_arr = pk_str.split('pk')
-        if len(pk_arr) == 2:
-            pk1_title = pk_arr[0].strip()
-            pk2_title = pk_arr[1].strip()
-            pk1_regx = re.compile(r'\b%s\b'%pk1_title, re.IGNORECASE)
-            pk2_regx = re.compile(r'\b%s\b'%pk2_title, re.IGNORECASE)
+        pk_str = request.form.get('pk').strip()
+        g = pk_regx.match(pk_str)
+        if g:
+            pk1_title = g.groups()[0]
+            pk2_title = g.groups()[2]
+            pk1_regx = re.compile(pk1_title, re.IGNORECASE)
+            pk2_regx = re.compile(pk2_title, re.IGNORECASE)
             pk1_item = mongo.db['items'].find_one({'title': pk1_regx })
             pk2_item = mongo.db['items'].find_one({'title': pk2_regx })
             if pk1_item and pk2_item:
@@ -47,14 +46,14 @@ def pk():
                         attrs.append({})
 
                 return render_template('pk.html', pk1=pk1_item, pk2=pk2_item,\
-                                       attrs=rows_by_name, TypeRender=TypeRender)
+                                       rows=rows_by_name, TypeRender=TypeRender)
             else:
                 if not pk1_item:
                     flash('搜索不到%s'%pk1_title, 'index')
                 if not pk2_item:
                     flash('搜索不到%s'%pk2_title, 'index')
         else:
-            flash('非法输入', 'index')
+            flash('输入格式有误', 'index')
     return redirect(url_for('.index'))
 
 @main.route('/explore')
@@ -115,6 +114,10 @@ def edit_attr():
                 }
             )
         if result:
+            mongo.db['users'].update(
+                {'_id': bson_obj_id(current_user.id)},
+                {'$inc': {'edit_count': 1}}
+            )
             return jsonify(status=True, reason="修改属性成功")
         else:
             return jsonify(status=True, reason="修改失败")
@@ -150,7 +153,7 @@ def add_attr():
             return jsonify(status=False, reason="属性值不能为空")
         if mongo.db['items'].find_one({'title': title, 'attributes.attr_name': attr_name}):
             return jsonify(status=False, reason="属性已存在")
-        mongo.db['items'].update(
+        status = mongo.db['items'].update(
             {'title': title},
             {
                 '$inc': {'attr_count': 1},
@@ -165,6 +168,11 @@ def add_attr():
                     }
             }
         )
+        if status:
+            mongo.db['users'].update(
+                {'_id': bson_obj_id(current_user.id)},
+                {'$inc': {'edit_count': 1}}
+            )
         html = TypeRender.render_html(attr_name, attr_value, attr_type)
         return jsonify(status=True, reason="添加属性成功", html=html)
 
@@ -175,7 +183,7 @@ def create_entry():
     if entry_form.validate_on_submit():
         title = request.form['title']
         type = request.form['type']
-        mongo.db.items.insert({
+        status = mongo.db['items'].insert({
             'title': title,
             'type': type,
             'attributes':[],
@@ -184,6 +192,11 @@ def create_entry():
             'created_at': datetime.utcnow(),
             'created_by': current_user.id
         })
+        if status:
+            mongo.db['users'].update(
+                {'_id': bson_obj_id(current_user.id)},
+                {'$inc': {'create_count': 1}}
+            )
         return redirect(url_for('.item', title=title))
     return render_template('create.html', entry_form=entry_form, title='创建条目')
 

@@ -20,7 +20,7 @@
           <td>{{pk1.type}}</td>
           <td>{{pk2.type}}</td>
         </tr>
-        {% for attr_name, list in attrs.items() %}
+        {% for attr_name, list in rows.items() %}
           {{ TypeRender.render_many(attr_name, list)|safe }}
         {% endfor %}
 
