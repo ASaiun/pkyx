@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
-from app import create_app
-
-app = create_app('dev')
+from app import app
 
 if __name__ == '__main__':
     app.run()

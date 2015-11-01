@@ -1,8 +1,8 @@
+from app.util import bson_obj_id, bson_to_json
 from flask import current_app
 from flask.ext.login import UserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from werkzeug.security import generate_password_hash, check_password_hash
-from util import bson_obj_id, bson_to_json
 
 import json
 
@@ -27,7 +27,7 @@ class User(UserMixin):
 
     @staticmethod
     def verify_auth_token(token):
-        from app import mongo
+        from app.extensions import mongo
         s = Serializer(current_app.config['SECRET_KEY'])
         try:
             data = s.loads(token)

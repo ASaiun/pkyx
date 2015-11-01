@@ -1,11 +1,11 @@
-from app import mongo
+from app.extensions import mongo
 from app.forms import LoginForm, BaseEntryForm
+from app.util import TypeRender, bson_obj_id
 from collections import defaultdict
 from datetime import datetime
 from flask import render_template, request, flash, url_for, abort, redirect, jsonify
 from flask.ext.login import current_user, login_required
 from random import randint
-from util import TypeRender, bson_obj_id
 
 from . import main
 import pymongo
@@ -49,11 +49,11 @@ def pk():
                                        rows=rows_by_name, TypeRender=TypeRender)
             else:
                 if not pk1_item:
-                    flash('搜索不到%s'%pk1_title, 'index')
+                    flash('搜索不到%s'%pk1_title, 'red')
                 if not pk2_item:
-                    flash('搜索不到%s'%pk2_title, 'index')
+                    flash('搜索不到%s'%pk2_title, 'red')
         else:
-            flash('输入格式有误', 'index')
+            flash('输入格式有误', 'red')
     return redirect(url_for('.index'))
 
 @main.route('/explore')

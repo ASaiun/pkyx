@@ -1,4 +1,4 @@
-from app import mongo
+from app.extensions import mongo
 from app.models import User
 from flask import g, jsonify
 from flask.ext.httpauth import HTTPBasicAuth

@@ -21,10 +21,10 @@
 {% block content %}
 {% include 'comp/header.html' %}
 {% include 'comp/login.html' %}
-{% with messages = get_flashed_messages(category_filter=["index"]) %}
+{% with messages = get_flashed_messages(with_categories=True) %}
     {% if messages %}
-      {% for message in messages %}
-          <div class="ui red message msg-fixed-top" id="tip">
+      {% for category, message in messages %}
+          <div class="ui {{category}} message msg-fixed-top" id="tip">
             <i class="close icon"></i>
             <div class="header">{{ message }}</div>
           </div>

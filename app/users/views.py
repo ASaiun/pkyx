@@ -1,13 +1,45 @@
-from app import mongo
+from app.extensions import mongo
 from app.forms import LoginForm, RegisterForm, ProfileForm
 from app.models import User
+from app.util import bson_obj_id, AllowFile
 from datetime import datetime
 from gridfs import GridFS, NoFile
 from flask import render_template, redirect, url_for, request, flash, jsonify, abort, make_response
 from flask.ext.login import login_required, login_user, logout_user, current_user
-from util import bson_obj_id, AllowFile
+from flask.ext.mail import Message
 from werkzeug.utils import secure_filename
+
+from app.tasks.mail import send_async_email
+
 from . import users
+
+def send_email(to, subject, template, **kwargs):
+    from app import app
+    msg = Message(app.config['MAIL_SUBJECT_PREFIX'] + subject,
+        sender= app.config['MAIL_DEFAULT_SENDER'], recipients=[to])
+    msg.html = render_template(template + '.html', **kwargs)
+    send_async_email.delay(msg)
+
+@users.route('/confirm/<token>')
+@login_required
+def confirm(token):
+    user = User.verify_auth_token(token)
+    if user:
+        print(user)
+        r = mongo.db['users'].update(
+            {'_id': user['_id']},
+            {'$set':
+                 {
+                     'active': True
+                 }
+            }
+        )
+        if r:
+            flash('激活成功', 'green')
+        else:
+            flash('激活失败', 'red')
+    return redirect(url_for('main.index'))
+
 
 @users.route('/sign_up', methods=['GET', 'POST'])
 def register():
@@ -29,11 +61,14 @@ def register():
                     'username':uname,
                     'password': User.gen_passwd_hash(passwd),
                     'avatar': '',
+                    'active': False,
                     'join': datetime.utcnow()
                 })
                 if id is not None:
                     user = User(bson_obj_id(id))
                     login_user(user)
+                    token = user.gen_auth_token(expiration=600)
+                    send_email(email, '欢迎注册pkyx,请确认你的账户', 'email', token=token)
                     return redirect(url_for('main.index'))
                 flash('注册失败', 'WARNING')
         else:
