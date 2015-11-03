@@ -78,5 +78,4 @@ class TypeRender:
 
     @classmethod
     def render(cls, name, content, type=None):
-        print(content)
         return cls._template.format(name=name, content=content, type=type)

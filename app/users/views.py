@@ -2,7 +2,6 @@ from app.extensions import mongo
 from app.forms import LoginForm, RegisterForm, ProfileForm
 from app.models import User
 from app.util import bson_obj_id, AllowFile
-from datetime import datetime
 from gridfs import GridFS, NoFile
 from flask import render_template, redirect, url_for, request, flash, jsonify, abort, make_response
 from flask.ext.login import login_required, login_user, logout_user, current_user
@@ -25,15 +24,7 @@ def send_email(to, subject, template, **kwargs):
 def confirm(token):
     user = User.verify_auth_token(token)
     if user:
-        print(user)
-        r = mongo.db['users'].update(
-            {'_id': user['_id']},
-            {'$set':
-                 {
-                     'active': True
-                 }
-            }
-        )
+        r = User.set_active(user['_id'])
         if r:
             flash('激活成功', 'green')
         else:
@@ -53,17 +44,10 @@ def register():
             rp_passwd = form.repeat.data
             if passwd != rp_passwd:
                 flash('两次密码不相同', 'WARNING')
-            elif mongo.db.users.find_one({'email':email}) is not None:
+            elif User.find_by_email(email) is not None:
                 flash('该邮箱已被注册', 'WARNING')
             else:
-                id = mongo.db['users'].insert({
-                    'email':email,
-                    'username':uname,
-                    'password': User.gen_passwd_hash(passwd),
-                    'avatar': '',
-                    'active': False,
-                    'join': datetime.utcnow()
-                })
+                id = User.add_user(email, uname, passwd)
                 if id is not None:
                     user = User(bson_obj_id(id))
                     login_user(user)
@@ -81,7 +65,7 @@ def login():
     if request.method == 'POST':
         form = LoginForm()
         if form.validate_on_submit():
-            db_user = mongo.db['users'].find_one({'email': form.email.data})
+            db_user = User.find_by_email(form.email.data)
             if db_user is not None:
                 db_passwd = db_user.get('password', None)
                 if User.verify_passwd(db_passwd, form.password.data):
@@ -102,13 +86,13 @@ def profile(id=None):
         if current_user is not None:
             return redirect(url_for('.profile', id=current_user.id))
     else:
-        user = mongo.db['users'].find_one({'_id': bson_obj_id(id)})
+        user = User.find_by_id(bson_obj_id(id))
     return render_template('profile.html', user=user)
 
 @users.route('/profile/edit', methods=['GET','POST'])
 @login_required
 def profile_edit():
-    user = mongo.db['users'].find_one({'_id': bson_obj_id(current_user.id)})
+    user = User.find_by_id(bson_obj_id(current_user.id))
     if not user:
         abort(404)
     form = ProfileForm()
@@ -135,18 +119,13 @@ def profile_edit():
                         fs.delete(bson_obj_id(user['avatar']))
                     data['avatar'] = avatar_id
             else:
-                flash('图片格式不支持')
+                flash('图片格式不支持', 'red')
 
+            User.update_user(user['_id'], data)
 
-            mongo.db['users'].update(
-                {'_id': user['_id'] },
-                {
-                    "$set": data
-                }
-            )
             return redirect(url_for('.profile'))
         else:
-            flash('资料修改失败', 'edit')
+            flash('资料修改失败', 'red')
     return render_template('profile_edit.html', user=user, form=form, title='编辑资料')
 
 @users.route("/logout")

@@ -1,14 +1,11 @@
-from app.extensions import mongo
 from app.forms import LoginForm, BaseEntryForm
-from app.util import TypeRender, bson_obj_id
+from app.models import Item
+from app.util import TypeRender
 from collections import defaultdict
-from datetime import datetime
 from flask import render_template, request, flash, url_for, abort, redirect, jsonify
 from flask.ext.login import current_user, login_required
-from random import randint
 
 from . import main
-import pymongo
 import re
 
 @main.route('/')
@@ -28,8 +25,8 @@ def pk():
             pk2_title = g.groups()[2]
             pk1_regx = re.compile(pk1_title, re.IGNORECASE)
             pk2_regx = re.compile(pk2_title, re.IGNORECASE)
-            pk1_item = mongo.db['items'].find_one({'title': pk1_regx })
-            pk2_item = mongo.db['items'].find_one({'title': pk2_regx })
+            pk1_item = Item.find_item(pk1_regx)
+            pk2_item = Item.find_item(pk2_regx)
             if pk1_item and pk2_item:
                 # 按首字母大小排序
                 rows_by_name = defaultdict(list)
@@ -58,14 +55,13 @@ def pk():
 
 @main.route('/explore')
 def explore():
-    items = mongo.db['items'].find().limit(20).sort('created_at', pymongo.DESCENDING)
+    items = Item.find_items()
     return render_template('explore.html', items=items, title='发现')
 
 @main.route('/lucky')
 def lucky():
     # 总条数
-    N = mongo.db['items'].count()
-    item = mongo.db['items'].find().limit(1).skip(randint(0, N-1))[0]
+    item = Item.get_random_item()
     if item:
         return redirect(url_for('.item', title=item['title']))
     return redirect(url_for('.index'))
@@ -77,20 +73,21 @@ def search():
         abort(404)
     keyword = q.strip()
     regx = re.compile(r'%s' %keyword, re.IGNORECASE)
-    list = mongo.db['items'].find({'title': regx }).limit(20).sort('created_at', pymongo.DESCENDING)
+    list = Item.find_items(regx)
     if list.count() == 0:
         flash('没有找到结果', 'search')
     return render_template('explore.html', items=list, title='搜索')
 
 @main.route('/item/<title>')
 def item(title):
-    item = mongo.db['items'].find_one({'title': title})
+    item = Item.find_item(title)
     if not item:
         abort(404)
-    mongo.db['items'].update({'title': title}, {"$inc": {"view": 1}})
+    Item.inc_view(title)
     return render_template('item.html', item=item, TypeRender=TypeRender)
 
 @main.route('/item/edit_attr', methods=['POST'])
+@login_required
 def edit_attr():
     if request.method == 'POST':
         title = request.json['title']
@@ -99,43 +96,20 @@ def edit_attr():
         attr_value = request.json['attr_value']
         if attr_value is None:
             return jsonify(status=False, reason="属性值不能为空")
-        result = mongo.db['items'].update(
-                {'title': title, "attributes.attr_name": attr_name},
-                {
-                    '$set':
-                        {
-                            'attributes.$':
-                                {
-                                    'attr_name': attr_name,
-                                    'attr_value': attr_value,
-                                    'attr_type': attr_type
-                                }
-                        }
-                }
-            )
+        result = Item.edit_attr(title, attr_name, attr_value, attr_type)
         if result:
-            mongo.db['users'].update(
-                {'_id': bson_obj_id(current_user.id)},
-                {'$inc': {'edit_count': 1}}
-            )
+            current_user.add_edit()
             return jsonify(status=True, reason="修改属性成功")
         else:
             return jsonify(status=True, reason="修改失败")
 
 @main.route('/item/del_attr', methods=['POST'])
+@login_required
 def del_attr():
     if request.method == 'POST':
         title = request.json['title']
         attr_name = request.json['attr_name']
-        result = mongo.db['items'].update(
-                {'title': title},
-                {
-                    '$pull':
-                    {
-                        'attributes': {'attr_name': attr_name}
-                    }
-                }
-            )
+        result = Item.del_attr(title, attr_name)
         if result:
             return jsonify(status=True, reason="删除属性成功")
         else:
@@ -151,52 +125,25 @@ def add_attr():
         attr_value = request.json['attr_value']
         if attr_value is None:
             return jsonify(status=False, reason="属性值不能为空")
-        if mongo.db['items'].find_one({'title': title, 'attributes.attr_name': attr_name}):
+        if Item.find_attr(title, attr_name):
             return jsonify(status=False, reason="属性已存在")
-        status = mongo.db['items'].update(
-            {'title': title},
-            {
-                '$inc': {'attr_count': 1},
-                '$push':
-                    {
-                        'attributes':
-                            {
-                                'attr_name': attr_name,
-                                'attr_value': attr_value,
-                                'attr_type': attr_type
-                            }
-                    }
-            }
-        )
+        status = Item.add_attr(title, attr_name, attr_value, attr_type)
         if status:
-            mongo.db['users'].update(
-                {'_id': bson_obj_id(current_user.id)},
-                {'$inc': {'edit_count': 1}}
-            )
+            if current_user:
+                current_user.add_edit()
         html = TypeRender.render_html(attr_name, attr_value, attr_type)
         return jsonify(status=True, reason="添加属性成功", html=html)
 
 @main.route('/create_entry', methods=['GET', 'POST'])
-@login_required
 def create_entry():
     entry_form = BaseEntryForm()
     if entry_form.validate_on_submit():
         title = request.form['title']
         type = request.form['type']
-        status = mongo.db['items'].insert({
-            'title': title,
-            'type': type,
-            'attributes':[],
-            'attr_count': 1,
-            'view': 0,
-            'created_at': datetime.utcnow(),
-            'created_by': current_user.id
-        })
+        status = Item.create_item(title, type)
         if status:
-            mongo.db['users'].update(
-                {'_id': bson_obj_id(current_user.id)},
-                {'$inc': {'create_count': 1}}
-            )
+            if current_user:
+                current_user.add_create()
         return redirect(url_for('.item', title=title))
     return render_template('create.html', entry_form=entry_form, title='创建条目')
 
