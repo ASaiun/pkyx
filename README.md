@@ -23,6 +23,8 @@ pkyx是基于Flask开发的一个比较网站，灵感来自于[VSChart](http://
 
 [Day 9：配置Celery&Redis运行后台任务](http://tonnie17.github.io/2015/11/01/pkyx-day9/)
 
+[Day 10：编写Dockerfile](http://tonnie17.github.io/2015/11/06/pkyx-day10/)
+
 ## 安装依赖
 ---
 

@@ -15,8 +15,6 @@ def create_app(config_name='dev'):
     # 初始化Celery
     celery.init_app(app)
     # 初始化Flask-mail
-    from flask.ext.mail import Mail
-    app.mail = Mail(app)
     mail.init_app(app)
     # 初始化Flask-Login
     login_manager.init_app(app)
