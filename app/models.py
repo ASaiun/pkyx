@@ -1,3 +1,4 @@
+#-*- coding:utf-8 -*-
 from app.extensions import mongo
 from app.util import bson_obj_id, bson_to_json
 from datetime import datetime
@@ -173,7 +174,10 @@ class Item(ItemMixin):
     @staticmethod
     def get_random_item():
         N = mongo.db['items'].count()
-        item = mongo.db['items'].find().limit(1).skip(randint(0, N-1))[0]
+	try:
+            item = mongo.db['items'].find().limit(1).skip(randint(0, N-1))[0]
+	except:
+	    item = None
         return item
 
     @staticmethod

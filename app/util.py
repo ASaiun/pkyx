@@ -1,3 +1,4 @@
+#-*- coding:utf-8 -*-
 from flask import json
 from bson import json_util, ObjectId
 

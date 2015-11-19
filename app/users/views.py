@@ -1,3 +1,4 @@
+#-*- coding:utf-8 -*-
 from app.extensions import mongo
 from app.forms import LoginForm, RegisterForm, ProfileForm
 from app.models import User

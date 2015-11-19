@@ -1,3 +1,4 @@
+#-*- coding:utf-8 -*-
 from app.forms import LoginForm, BaseEntryForm
 from app.models import Item
 from app.util import TypeRender

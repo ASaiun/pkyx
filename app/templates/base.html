@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="{{ url_for('static', filename='components/semantic/dist/semantic.min.css') }}">
+<link href="http://cdn.bootcss.com/semantic-ui/2.1.6/semantic.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     {% block head %}
     {% endblock %}
@@ -11,8 +11,8 @@
 {% block content %}
 {% endblock %}
 </body>
-<script src="{{ url_for('static', filename='components/jquery/dist/jquery.min.js') }}"></script>
-<script src="{{ url_for('static', filename='components/semantic/dist/semantic.min.js') }}"></script>
+<script src="http://cdn.bootcss.com/jquery/2.1.4/jquery.min.js"></script>
+<script src="http://cdn.bootcss.com/semantic-ui/2.1.6/semantic.min.js"></script>
 <script>
     $(function(){
         $('.message .close').on('click', function() {

@@ -1,3 +1,4 @@
+#-*- coding:utf-8 -*-
 from flask import Flask
 from app.config import config
 from app.extensions import mongo, mail, login_manager, celery

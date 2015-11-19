@@ -2,6 +2,8 @@
 
 pkyx是基于Flask开发的一个比较网站，灵感来自于[VSChart](http://vschart.com)。
 
+demo: [pkyx](http://45.78.53.13)
+
 ## 开发过程
 ---
 

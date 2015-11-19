@@ -1,3 +1,4 @@
+#-*- coding:utf-8 -*-
 from app.models import Item
 from app.util import bson_to_json, bson_obj_id
 from flask import request, jsonify
