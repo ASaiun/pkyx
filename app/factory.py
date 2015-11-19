@@ -33,6 +33,10 @@ def create_app(config_name='dev'):
             user = User(user_id, extras=db_user)
         return user
 
+    # @login_manager.unauthorized_handler
+    # def unauthorized():
+    #   pass
+
 
     from app.main import main as main_blueprint
     app.register_blueprint(main_blueprint)

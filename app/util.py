@@ -25,7 +25,7 @@ class TypeRender:
         </tr>
     '''
 
-    _content = '<td class="{attr_cls}">{attr_content}</td>'
+    _content = '<td class="attr {attr_cls}">{attr_content}</td>'
 
     _type = {
         'text': '{v}',

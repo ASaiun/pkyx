@@ -88,7 +88,6 @@ def item(title):
     return render_template('item.html', item=item, TypeRender=TypeRender)
 
 @main.route('/item/edit_attr', methods=['POST'])
-@login_required
 def edit_attr():
     if request.method == 'POST':
         title = request.json['title']
@@ -97,9 +96,10 @@ def edit_attr():
         attr_value = request.json['attr_value']
         if attr_value is None:
             return jsonify(status=False, reason="属性值不能为空")
-        result = Item.edit_attr(title, attr_name, attr_value, attr_type)
-        if result:
-            current_user.add_edit()
+        status = Item.edit_attr(title, attr_name, attr_value, attr_type)
+        if status:
+            if current_user.is_authenticated:
+                current_user.add_edit()
             return jsonify(status=True, reason="修改属性成功")
         else:
             return jsonify(status=True, reason="修改失败")
@@ -110,15 +110,14 @@ def del_attr():
     if request.method == 'POST':
         title = request.json['title']
         attr_name = request.json['attr_name']
-        result = Item.del_attr(title, attr_name)
-        if result:
+        status = Item.del_attr(title, attr_name)
+        if status:
             return jsonify(status=True, reason="删除属性成功")
         else:
             return jsonify(status=True, reason="删除失败")
 
 
 @main.route('/item/add_attr', methods=['POST'])
-@login_required
 def add_attr():
     if request.method == 'POST':
         title = request.json['title']
@@ -127,11 +126,11 @@ def add_attr():
         attr_value = request.json['attr_value']
         if attr_value is None:
             return jsonify(status=False, reason="属性值不能为空")
-        if Item.find_attr(title, attr_name):
+        if Item.find_attr(title, attr_name) is not None:
             return jsonify(status=False, reason="属性已存在")
         status = Item.add_attr(title, attr_name, attr_value, attr_type)
         if status:
-            if current_user:
+            if current_user.is_authenticated:
                 current_user.add_edit()
         html = TypeRender.render_html(attr_name, attr_value, attr_type)
         return jsonify(status=True, reason="添加属性成功", html=html)
@@ -144,7 +143,7 @@ def create_entry():
         type = request.form['type']
         status = Item.create_item(title, type)
         if status:
-            if current_user:
+            if current_user.is_authenticated:
                 current_user.add_create()
         return redirect(url_for('.item', title=title))
     return render_template('create.html', entry_form=entry_form, title='创建条目')

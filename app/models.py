@@ -174,10 +174,10 @@ class Item(ItemMixin):
     @staticmethod
     def get_random_item():
         N = mongo.db['items'].count()
-	try:
+        try:
             item = mongo.db['items'].find().limit(1).skip(randint(0, N-1))[0]
-	except:
-	    item = None
+        except:
+            item = None
         return item
 
     @staticmethod
