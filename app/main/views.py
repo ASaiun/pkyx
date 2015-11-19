@@ -118,6 +118,7 @@ def del_attr():
 
 
 @main.route('/item/add_attr', methods=['POST'])
+@login_required
 def add_attr():
     if request.method == 'POST':
         title = request.json['title']

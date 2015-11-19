@@ -7,6 +7,7 @@
 
         $(document).on("click", selector, function(ev) {
                $('.ui.modal').modal('show');
+		return false;
            }
        );
 

@@ -23,7 +23,7 @@
         </a>
       <a class="item" href="{{ url_for('users.logout') }}" id="logout">登出</a>
       {% else %}
-      <a class="item" href="#" id="login">登录</a>
+      <a class="item" href="{{ url_for('users.register') }}" id="login">登录</a>
     {% endif %}
   </div>
   </div>

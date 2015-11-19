@@ -70,7 +70,7 @@
     </form>
 
     <div class="ui  message">
-      已有账号? <a id="sign_in">登录</a>
+      已有账号<a id="do_login">登录</a>
     </div>
   </div>
 </div>
@@ -80,7 +80,7 @@
 <script src="{{ url_for('static', filename='js/login.js') }}"></script>
 <script>
     $(function(){
-        $('#sign_in').login();
+        $('#do_login').login();
     });
 </script>
 {% endblock %}
