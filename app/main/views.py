@@ -116,7 +116,6 @@ def del_attr():
         else:
             return jsonify(status=True, reason="删除失败")
 
-
 @main.route('/item/add_attr', methods=['POST'])
 def add_attr():
     if request.method == 'POST':
@@ -124,7 +123,9 @@ def add_attr():
         attr_name = request.json['attr_name'].strip()
         attr_type = request.json['attr_type']
         attr_value = request.json['attr_value']
-        if attr_value is None:
+        if not attr_name:
+            return jsonify(status=False, reason="属性名不能为空")
+        if not attr_value:
             return jsonify(status=False, reason="属性值不能为空")
         if Item.find_attr(title, attr_name) is not None:
             return jsonify(status=False, reason="属性已存在")
