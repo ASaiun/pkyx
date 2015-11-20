@@ -57,8 +57,9 @@ def register():
                     return redirect(url_for('main.index'))
                 flash('注册失败', 'WARNING')
         else:
-            for field, error in form.errors.items():
-                flash("%s: %s" %(getattr(form, field).label.text, error), 'WARNING')
+            for field, errors in form.errors.items():
+                for error in errors:
+                    flash("%s: %s" %(getattr(form, field).label.text, error), 'WARNING')
     return render_template('register.html', form=form, lg_form=lg_form)
 
 @users.route('/login', methods=['POST'])

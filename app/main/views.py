@@ -142,12 +142,25 @@ def add_attr():
 def create_entry():
     entry_form = BaseEntryForm()
     if entry_form.validate_on_submit():
-        title = request.form['title']
-        type = request.form['type']
-        status = Item.create_item(title, type)
-        if status:
-            if current_user.is_authenticated:
-                current_user.add_create()
-        return redirect(url_for('.item', title=title))
-    return render_template('create.html', entry_form=entry_form, title='创建条目')
+        title = request.form['title'].strip()
+        type = request.form['type'].strip()
+        if not title:
+            flash('属性不能为空', 'red')
+        elif not type:
+            flash('类型不能为空', 'red')
+        elif Item.find_item(title):
+            flash('词条已存在', 'yellow')
+        else:
+            status = Item.create_item(title, type)
+            if status:
+                Item.add_type(type)
+                if current_user.is_authenticated:
+                    current_user.add_create()
+            return redirect(url_for('.item', title=title))
+    else:
+        for field, errors in entry_form.errors.items():
+            for error in errors:
+                flash("%s: %s" %(getattr(entry_form, field).label.text, error), 'red')
+    types = Item.types()
+    return render_template('create.html', entry_form=entry_form, title='创建条目', types=types)
 

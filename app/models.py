@@ -168,6 +168,18 @@ class ItemMixin(object):
 
 class Item(ItemMixin):
     @staticmethod
+    def add_type(type_name):
+        return mongo.db['types'].insert({'name': type_name})
+
+    @staticmethod
+    def del_type(type_name):
+        return mongo.db['types'].remove({'name': type_name})
+
+    @staticmethod
+    def types():
+        return mongo.db['types'].find()
+
+    @staticmethod
     def add_param(dic, key, value):
         dic["attributes."+key] = value.strip()
 

@@ -32,8 +32,8 @@ class RegisterForm(Form):
     repeat = PasswordField('重复密码', validators=validators['password'])
 
 class BaseEntryForm(Form):
-    title = StringField('名称', validators=[DataRequired()])
-    type = StringField('类别', validators=[DataRequired()])
+    title = StringField('名称', validators=[DataRequired(message=_required_text)])
+    type = StringField('类别', validators=[DataRequired(message=_required_text)])
 
 class ProfileForm(Form):
     username = StringField('呢称*', validators=validators['username'])
