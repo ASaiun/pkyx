@@ -33,7 +33,7 @@ class RegisterForm(Form):
 
 class BaseEntryForm(Form):
     title = StringField('名称', validators=[DataRequired()])
-    type = StringField('类型', validators=[DataRequired()])
+    type = StringField('类别', validators=[DataRequired()])
 
 class ProfileForm(Form):
     username = StringField('呢称*', validators=validators['username'])

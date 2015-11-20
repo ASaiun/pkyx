@@ -91,10 +91,12 @@ def item(title):
 def edit_attr():
     if request.method == 'POST':
         title = request.json['title']
-        attr_name = request.json['attr_name']
+        attr_name = request.json['attr_name'].strip()
         attr_type = request.json['attr_type']
-        attr_value = request.json['attr_value']
-        if attr_value is None:
+        attr_value = request.json['attr_value'].strip()
+        if not attr_name:
+            return jsonify(status=False, reason="属性名不能为空")
+        if not attr_value:
             return jsonify(status=False, reason="属性值不能为空")
         status = Item.edit_attr(title, attr_name, attr_value, attr_type)
         if status:
@@ -122,7 +124,7 @@ def add_attr():
         title = request.json['title']
         attr_name = request.json['attr_name'].strip()
         attr_type = request.json['attr_type']
-        attr_value = request.json['attr_value']
+        attr_value = request.json['attr_value'].strip()
         if not attr_name:
             return jsonify(status=False, reason="属性名不能为空")
         if not attr_value:

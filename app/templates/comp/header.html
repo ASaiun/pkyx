@@ -10,7 +10,7 @@
             <div class="ui search">
                 <div class="ui icon input">
                   <i class="search icon"></i>
-                  <input type="text" placeholder="搜索..." name="q">
+                  <input type="text" placeholder="搜索..." name="q" autocomplete="off">
                 </div>
             </div>
         </form>
@@ -24,6 +24,7 @@
       <a class="item" href="{{ url_for('users.logout') }}" id="logout">登出</a>
       {% else %}
       <a class="item" href="{{ url_for('users.register') }}" id="login">登录</a>
+      <a class="item" href="#" id="what">什么是pkyx?</a>
     {% endif %}
   </div>
   </div>

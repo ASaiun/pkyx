@@ -1,3 +1,7 @@
+body {
+    font-family: Helvetica, Tahoma, Arial, "Microsoft YaHei", "微软雅黑", SimSun, "宋体", STXihei, "华文细黑", Heiti, "黑体", sans-serif;
+}
+
 .WARNING {
     color: rgb(236, 204, 56);
 }
