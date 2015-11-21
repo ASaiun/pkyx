@@ -39,26 +39,14 @@
         </div>
     </form>
 </div>
-<div class="ui page dimmer">
-  <div class="content">
-    <div class="center">
-      <img class="ui image centered" src="http://7sbqim.com1.z0.glb.clouddn.com/pkyxlogo.png" alt="pkyx logo">
-      <br>
-        <p>pkyx是基于Flask开发的一个比较维基网站，中文译名为「PK一下」,灵感来自于VSChart。</p>
-        <p>通过pkyx，你可以清晰地查看物品的属性，或者通过比较更好地作出选择，更重要的是，你可以创建知识词条，方便自己和他人的使用，快向世界分享你的知识吧!</p>
-        <span>源码: <a style="color:#00b5ad;" href="https://github.com/tonnie17/pkyx">https://github.com/tonnie17/pkyx</a></span>
-    </div>
-  </div>
-</div>
+
 {% endblock %}
 {% block js %}
 <script src="{{ url_for('static', filename='js/login.js') }}"></script>
 <script>
     $(function(){
         $('#login').login();
-        $('#what').on('click', function(){
-          $('.dimmer').dimmer('show');
-        });
+
     });
 </script>
 {% endblock %}

@@ -13,6 +13,8 @@ def create_app(config_name='dev'):
     config[config_name].init_app(app)
     # 初始化MongoDB
     mongo.init_app(app)
+    with app.app_context():
+        mongo.db['items'].create_index('title', background=True)
     # 初始化Celery
     celery.init_app(app)
     # 初始化Flask-mail

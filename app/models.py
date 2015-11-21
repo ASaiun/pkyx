@@ -169,7 +169,8 @@ class ItemMixin(object):
 class Item(ItemMixin):
     @staticmethod
     def add_type(type_name):
-        return mongo.db['types'].insert({'name': type_name})
+        return mongo.db['types'].replace_one({'name': type_name},
+                                 {'name': type_name, 'modified':datetime.utcnow()}, upsert=True )
 
     @staticmethod
     def del_type(type_name):
