@@ -18,6 +18,12 @@ class User(UserMixin):
             for name, attr in extras.items():
                 setattr(self, name, attr)
 
+    @property
+    def is_admin(self):
+        return mongo.db['users'].find_one(
+            {'_id': bson_obj_id(self.id), 'admin':True},
+        ) != None
+
     def add_create(self):
         mongo.db['users'].update(
             {'_id': bson_obj_id(self.id)},
